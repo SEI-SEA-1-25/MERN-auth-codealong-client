@@ -2,7 +2,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import jwt_decode from 'jwt-decode'
 import { Redirect } from 'react-router-dom'
-import Profile from './Profile'
+import Profile from './Profile.jsx'
 
 export default function Login(props) {
   // app state for controlled form
@@ -37,7 +37,8 @@ export default function Login(props) {
     } catch(error) {
       // if the login failed -- display a message
       if(error.response.status === 400) {
-        setMessage('bad user name or password')
+        // console.log(error.response.data)
+        setMessage(error.response.data.msg)
       } else {
         console.error(error)
       }
