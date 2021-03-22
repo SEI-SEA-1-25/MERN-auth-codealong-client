@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
+import jwt_decode from 'jwt-decode'
 import Navbar from './components/Navbar'
 import Login from './components/Login'
 import Profile from './components/Profile'
@@ -12,10 +13,25 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null)
 
   // useEffect if the user navigates away from the site and comes back
+  useEffect(() => {
+    const token = localStorage.getItem('jwtToken')
+    if(token) {
+      // decode the token if it is found in local storage
+      const decoded = jwt_decode(token)
+      // set the current user
+      setCurrentUser(decoded)
+    } else {
+      // make sure state reflects that there is no user logged in
+      setCurrentUser(null)
+    }
+  }, [])
 
   // deletes the jwt from local storage when the user wants to log out
   const handleLogout = () => {
-    console.log('log user out')
+    if (localStorage.getItem('jwtToken')) {
+      localStorage.removeItem('jwtToken')
+      setCurrentUser(null)
+    }
   }
 
   return (
@@ -40,7 +56,9 @@ function App() {
 
           <Route 
             path='/profile'
-            render={ (props) => <Profile {...props} currentUser={ currentUser } setCurrentUser={ setCurrentUser} /> } 
+            render={ (props) => currentUser 
+              ? <Profile {...props} handleLogout={ handleLogout } currentUser={ currentUser } setCurrentUser={ setCurrentUser} /> 
+              : <Redirect to='/login' /> } 
           />
 
         </Switch>
